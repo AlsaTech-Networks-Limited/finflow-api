@@ -24,6 +24,14 @@
         <kotlin.compiler.jvmTarget>21</kotlin.compiler.jvmTarget>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>github</id>
+            <name>GitHub c-kiplimo Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/c-kiplimo/common</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- Reactive web -->
         <dependency>
@@ -97,6 +105,13 @@
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-coroutines-reactor</artifactId>
             <version>1.9.0</version>
+        </dependency>
+
+        <!-- Common library from GitHub -->
+        <dependency>
+            <groupId>com.collicode</groupId>
+            <artifactId>common</artifactId>
+            <version>0.0.1</version>
         </dependency>
 
         <!-- Test -->
