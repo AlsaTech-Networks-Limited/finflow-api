@@ -1,7 +1,9 @@
 package com.alsatech.finflow.infrastructure.persistence.r2dbc
 
 import com.alsatech.finflow.domain.model.*
-import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+import org.springframework.data.repository.reactive.ReactiveCrudRepository
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import java.util.UUID
 
 /**
@@ -9,33 +11,35 @@ import java.util.UUID
  * at runtime (no method bodies needed). These are wrapped by adapter classes
  * (e.g. ExpenseRepositoryAdapter) that implement the domain repository ports,
  * so `application`/`domain` never see Spring Data types directly.
+ *
+ * Uses Mono/Flux for reactive streams instead of coroutines.
  */
-interface CompanyR2dbcRepository : CoroutineCrudRepository<Company, UUID>
+interface CompanyR2dbcRepository : ReactiveCrudRepository<Company, UUID>
 
-interface UserR2dbcRepository : CoroutineCrudRepository<User, UUID> {
-    suspend fun findByEmail(email: String): User?
+interface UserR2dbcRepository : ReactiveCrudRepository<User, UUID> {
+    fun findByEmail(email: String): Mono<User>
 }
 
-interface AccountR2dbcRepository : CoroutineCrudRepository<Account, UUID> {
-    suspend fun findByCompanyId(companyId: UUID): List<Account>
+interface AccountR2dbcRepository : ReactiveCrudRepository<Account, UUID> {
+    fun findByCompanyId(companyId: UUID): Flux<Account>
 }
 
-interface TransactionR2dbcRepository : CoroutineCrudRepository<Transaction, UUID> {
-    suspend fun findByAccountId(accountId: UUID): List<Transaction>
+interface TransactionR2dbcRepository : ReactiveCrudRepository<Transaction, UUID> {
+    fun findByAccountId(accountId: UUID): Flux<Transaction>
 }
 
-interface CategoryR2dbcRepository : CoroutineCrudRepository<Category, UUID> {
-    suspend fun findByCompanyId(companyId: UUID): List<Category>
+interface CategoryR2dbcRepository : ReactiveCrudRepository<Category, UUID> {
+    fun findByCompanyId(companyId: UUID): Flux<Category>
 }
 
-interface ExpenseR2dbcRepository : CoroutineCrudRepository<Expense, UUID> {
-    suspend fun findByUserId(userId: UUID): List<Expense>
+interface ExpenseR2dbcRepository : ReactiveCrudRepository<Expense, UUID> {
+    fun findByUserId(userId: UUID): Flux<Expense>
 }
 
-interface InvoiceR2dbcRepository : CoroutineCrudRepository<Invoice, UUID> {
-    suspend fun findByCompanyId(companyId: UUID): List<Invoice>
+interface InvoiceR2dbcRepository : ReactiveCrudRepository<Invoice, UUID> {
+    fun findByCompanyId(companyId: UUID): Flux<Invoice>
 }
 
-interface ApprovalR2dbcRepository : CoroutineCrudRepository<Approval, UUID> {
-    suspend fun findByExpenseId(expenseId: UUID): List<Approval>
+interface ApprovalR2dbcRepository : ReactiveCrudRepository<Approval, UUID> {
+    fun findByExpenseId(expenseId: UUID): Flux<Approval>
 }
