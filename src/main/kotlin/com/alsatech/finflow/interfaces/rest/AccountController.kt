@@ -8,6 +8,8 @@ import com.alsatech.finflow.interfaces.dto.CreateAccountRequest
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import java.util.UUID
 
 @RestController
@@ -18,26 +20,25 @@ class AccountController(
 ) {
 
     @GetMapping
-    suspend fun listAccounts(
+    fun listAccounts(
         @RequestParam companyId: UUID
-    ): List<AccountResponse> {
-        val accounts = listAccountsUseCase.execute(companyId)
-        return accounts.map { AccountMapper.toResponse(it) }
+    ): Flux<AccountResponse> {
+        return listAccountsUseCase.execute(companyId)
+            .map { AccountMapper.toResponse(it) }
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    suspend fun createAccount(
+    fun createAccount(
         @RequestParam companyId: UUID,
         @Valid @RequestBody request: CreateAccountRequest
-    ): AccountResponse {
-        val account = createAccountUseCase.execute(
+    ): Mono<AccountResponse> {
+        return createAccountUseCase.execute(
             companyId = companyId,
             name = request.name,
             currency = request.currency,
             balance = request.balance,
             type = request.type
-        )
-        return AccountMapper.toResponse(account)
+        ).map { AccountMapper.toResponse(it) }
     }
 }
