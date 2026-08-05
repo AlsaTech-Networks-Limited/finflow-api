@@ -1,7 +1,7 @@
 package com.alsatech.finflow.shared.infrastructure.persistence
 
-import com.alsatech.finflow.shared.domain.User
-import com.alsatech.finflow.shared.domain.UserRepository
+import com.alsatech.finflow.shared.domain.entity.User
+import com.alsatech.finflow.shared.domain.repository.UserRepository
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Query

@@ -77,12 +77,7 @@ src/main/kotlin/com/alsatech/finflow/
 │       ├── config/                    # Spring Configuration
 │       ├── security/                  # Security & JWT
 │       └── external/                  # External APIs (LLM, Email, Storage)
-│
-└── [old structure - to be deprecated]
-    ├── domain/
-    ├── application/
-    ├── infrastructure/
-    └── interfaces/
+
 ```
 
 ---

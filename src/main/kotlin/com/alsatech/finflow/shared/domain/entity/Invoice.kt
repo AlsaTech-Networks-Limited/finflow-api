@@ -1,4 +1,4 @@
-package com.alsatech.finflow.shared.domain
+package com.alsatech.finflow.shared.domain.entity
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
