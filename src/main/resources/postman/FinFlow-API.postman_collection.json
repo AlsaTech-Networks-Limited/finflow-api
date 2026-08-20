@@ -1,0 +1,228 @@
+{
+	"info": {
+		"_postman_id": "finflow-api-collection",
+		"name": "FinFlow API",
+		"description": "Complete API collection for FinFlow application with wrapped meta/payload structure",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Expense",
+			"item": [
+				{
+					"name": "Submit Expense",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "X-RequestId",
+								"value": "{{$guid}}",
+								"description": "Client-generated request trace ID"
+							},
+							{
+								"key": "X-TenantCode",
+								"value": "{{tenantCode}}",
+								"description": "Tenant code for multi-tenancy",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"meta\": {\n    \"source\": \"postman\",\n    \"requestId\": \"{{$guid}}\"\n  },\n  \"payload\": {\n    \"userId\": 1,\n    \"categoryId\": 1,\n    \"amount\": 150.50,\n    \"notes\": \"Client lunch meeting\",\n    \"receiptUrl\": \"https://example.com/receipts/123.pdf\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/expenses",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "expenses"]
+						},
+						"description": "Submit a new expense for approval. Request is wrapped in meta/payload structure."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Expense by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "X-RequestId",
+								"value": "{{$guid}}",
+								"description": "Client-generated request trace ID"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/expenses/{{expenseId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "expenses", "{{expenseId}}"]
+						},
+						"description": "Fetch expense details by ID including approval history. Response is wrapped in meta/payload structure."
+					},
+					"response": []
+				},
+				{
+					"name": "List Expenses by User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "X-RequestId",
+								"value": "{{$guid}}",
+								"description": "Client-generated request trace ID"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/expenses?userId=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "expenses"],
+							"query": [
+								{
+									"key": "userId",
+									"value": "1",
+									"description": "Filter by user ID"
+								}
+							]
+						},
+						"description": "Fetch all expenses for a specific user. Response is wrapped in meta/payload structure."
+					},
+					"response": []
+				},
+				{
+					"name": "List Pending Expenses by Company",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "X-RequestId",
+								"value": "{{$guid}}",
+								"description": "Client-generated request trace ID"
+							},
+							{
+								"key": "X-TenantCode",
+								"value": "{{tenantCode}}",
+								"description": "Tenant code for multi-tenancy"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/expenses?companyId=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "expenses"],
+							"query": [
+								{
+									"key": "companyId",
+									"value": "1",
+									"description": "Filter by company ID"
+								}
+							]
+						},
+						"description": "Fetch all pending expenses for a company. Response is wrapped in meta/payload structure."
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Expense",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "X-RequestId",
+								"value": "{{$guid}}",
+								"description": "Client-generated request trace ID"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"meta\": {\n    \"source\": \"postman\",\n    \"requestId\": \"{{$guid}}\"\n  },\n  \"payload\": {\n    \"approverId\": 2,\n    \"comment\": \"Approved - valid business expense\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/expenses/{{expenseId}}/approve",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "expenses", "{{expenseId}}", "approve"]
+						},
+						"description": "Approve a pending expense. Request is wrapped in meta/payload structure."
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Expense",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "X-RequestId",
+								"value": "{{$guid}}",
+								"description": "Client-generated request trace ID"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"meta\": {\n    \"source\": \"postman\",\n    \"requestId\": \"{{$guid}}\"\n  },\n  \"payload\": {\n    \"approverId\": 2,\n    \"comment\": \"Rejected - missing receipt or invalid expense\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/expenses/{{expenseId}}/reject",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "expenses", "{{expenseId}}", "reject"]
+						},
+						"description": "Reject a pending expense. Comment is required. Request is wrapped in meta/payload structure."
+					},
+					"response": []
+				}
+			],
+			"description": "Expense management endpoints - submit, approve, reject, and query expenses"
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "expenseId",
+			"value": "1",
+			"type": "string",
+			"description": "Expense ID for testing"
+		},
+		{
+			"key": "tenantCode",
+			"value": "TENANT001",
+			"type": "string",
+			"description": "Tenant code for multi-tenancy support"
+		}
+	]
+}

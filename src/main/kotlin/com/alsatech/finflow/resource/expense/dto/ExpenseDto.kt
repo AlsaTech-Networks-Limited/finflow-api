@@ -1,0 +1,140 @@
+package com.alsatech.finflow.resource.expense.dto
+
+import com.alsatech.finflow.resource.expense.domain.entity.ExpenseStatus
+import com.collicode.common.util.AuditInfo
+import com.fasterxml.jackson.annotation.JsonFormat
+import jakarta.validation.constraints.*
+import java.math.BigDecimal
+import java.time.LocalDateTime
+
+// ================= COMMAND DTOs (Requests) =================
+
+data class SubmitExpenseCommand(
+    @field:NotNull(message = "User ID is required")
+    @field:Positive(message = "User ID must be positive")
+    val userId: Long,
+
+    @field:NotNull(message = "Category ID is required")
+    @field:Positive(message = "Category ID must be positive")
+    val categoryId: Long,
+
+    @field:NotNull(message = "Amount is required")
+    @field:DecimalMin(value = "0.01", message = "Amount must be greater than 0")
+    @field:Digits(integer = 12, fraction = 2, message = "Amount must have at most 12 digits and 2 decimal places")
+    val amount: BigDecimal,
+
+    @field:Size(max = 500, message = "Notes must not exceed 500 characters")
+    val notes: String? = null,
+
+    val receiptUrl: String? = null,
+
+    val auditInfo: AuditInfo? = null
+)
+
+data class ApproveExpenseCommand(
+    @field:NotBlank(message = "Expense ID is required")
+    val expenseId: String,
+
+    @field:NotNull(message = "Approver ID is required")
+    @field:Positive(message = "Approver ID must be positive")
+    val approverId: Long,
+
+    @field:Size(max = 500, message = "Comment must not exceed 500 characters")
+    val comment: String? = null,
+
+    val auditInfo: AuditInfo? = null
+)
+
+data class RejectExpenseCommand(
+    @field:NotBlank(message = "Expense ID is required")
+    val expenseId: String,
+
+    @field:NotNull(message = "Approver ID is required")
+    @field:Positive(message = "Approver ID must be positive")
+    val approverId: Long,
+
+    @field:NotBlank(message = "Comment is required when rejecting an expense")
+    @field:Size(max = 500, message = "Comment must not exceed 500 characters")
+    val comment: String,
+
+    val auditInfo: AuditInfo? = null
+)
+
+data class GetExpenseQuery(
+    val expenseId: String
+)
+
+data class ListExpensesQuery(
+    val userId: Long? = null,
+    val status: ExpenseStatus? = null,
+    val companyId: Long? = null
+)
+
+// ================= RESPONSE DTOs =================
+
+/**
+ * Expense list response DTO.
+ * Used for list endpoints (GET /api/v1/expenses).
+ * ExpenseId format: "exp_1704067200001" (entity-identifiable with prefix).
+ */
+data class ExpenseDto(
+    val expenseId: String,
+    val userId: Long,
+    val categoryId: Long,
+    val amount: BigDecimal,
+    val status: ExpenseStatus,
+    val receiptUrl: String?,
+    val notes: String?,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
+    val createdAt: LocalDateTime,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
+    val updatedAt: LocalDateTime
+)
+
+/**
+ * Expense detail response DTO.
+ * Used for single expense endpoints (GET /api/v1/expenses/{id}).
+ * Includes full approval history.
+ * ExpenseId format: "exp_1704067200001" (entity-identifiable with prefix).
+ */
+data class ExpenseDetailDto(
+    val expenseId: String,
+    val userId: Long,
+    val categoryId: Long,
+    val amount: BigDecimal,
+    val status: ExpenseStatus,
+    val receiptUrl: String?,
+    val notes: String?,
+    val approvals: List<ApprovalDto>,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
+    val createdAt: LocalDateTime,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
+    val updatedAt: LocalDateTime
+)
+
+/**
+ * Approval response DTO.
+ * Nested in ExpenseDetailDto to show approval history.
+ * ApprovalId format: "app_1704067300001" (entity-identifiable with prefix).
+ * ExpenseId format: "exp_1704067200001" (entity-identifiable with prefix).
+ */
+data class ApprovalDto(
+    val approvalId: String,
+    val expenseId: String,
+    val approverId: Long,
+    val decision: String,
+    val comment: String?,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
+    val decidedAt: LocalDateTime,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
+    val createdAt: LocalDateTime,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
+    val updatedAt: LocalDateTime
+)

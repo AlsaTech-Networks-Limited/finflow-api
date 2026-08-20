@@ -1,71 +1,81 @@
--- See BACKEND-README.md "Database Schema (8 tables)" for the rationale behind each table.
+-- ==========================================================
+-- Flyway Migration Script
+-- Version: V1
+-- File: V1__init.sql
+-- Purpose: Create base schema (companies, users, categories, accounts)
+-- Author: System
+-- Date: 2025-01-15
+-- ==========================================================
 
-CREATE TABLE companies (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL,
-    plan TEXT NOT NULL DEFAULT 'free',
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+-- ==========================================================
+-- Create schema if it doesn't exist
+-- ==========================================================
+CREATE SCHEMA IF NOT EXISTS exp_finlow;
+
+-- Set search path to use exp_finlow schema
+SET search_path TO exp_finlow;
+
+-- ==========================================================
+-- Drop existing tables (for development resets)
+-- ==========================================================
+DROP TABLE IF EXISTS exp_finlow.accounts CASCADE;
+DROP TABLE IF EXISTS exp_finlow.categories CASCADE;
+DROP TABLE IF EXISTS exp_finlow.users CASCADE;
+DROP TABLE IF EXISTS exp_finlow.companies CASCADE;
+
+-- ==========================================================
+-- Table: companies
+-- Purpose: Store company/organization master records
+-- ==========================================================
+CREATE TABLE exp_finlow.companies (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(250) NOT NULL,
+    plan VARCHAR(50) NOT NULL DEFAULT 'free',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    company_id UUID NOT NULL REFERENCES companies(id),
-    email TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL,
-    role TEXT NOT NULL CHECK (role IN ('USER', 'MANAGER', 'ADMIN')),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+-- ==========================================================
+-- Table: users
+-- Purpose: Store user accounts and authentication
+-- ==========================================================
+CREATE TABLE exp_finlow.users (
+    id BIGSERIAL PRIMARY KEY,
+    company_id BIGINT NOT NULL REFERENCES exp_finlow.companies(id),
+    email VARCHAR(250) NOT NULL UNIQUE,
+    password_hash VARCHAR(500) NOT NULL,
+    role VARCHAR(50) NOT NULL CHECK (role IN ('USER', 'MANAGER', 'ADMIN')),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE accounts (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    company_id UUID NOT NULL REFERENCES companies(id),
-    name TEXT NOT NULL,
-    currency TEXT NOT NULL DEFAULT 'USD',
+-- ==========================================================
+-- Table: categories
+-- Purpose: Store expense/transaction categories
+-- ==========================================================
+CREATE TABLE exp_finlow.categories (
+    id BIGSERIAL PRIMARY KEY,
+    company_id BIGINT NOT NULL REFERENCES exp_finlow.companies(id),
+    name VARCHAR(250) NOT NULL,
+    parent_id BIGINT REFERENCES exp_finlow.categories(id)
+);
+
+-- ==========================================================
+-- Table: accounts
+-- Purpose: Store financial accounts for each company
+-- ==========================================================
+CREATE TABLE exp_finlow.accounts (
+    id BIGSERIAL PRIMARY KEY,
+    company_id BIGINT NOT NULL REFERENCES exp_finlow.companies(id),
+    name VARCHAR(250) NOT NULL,
+    currency VARCHAR(10) NOT NULL DEFAULT 'USD',
     balance NUMERIC(14, 2) NOT NULL DEFAULT 0,
-    type TEXT NOT NULL
+    type VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE categories (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    company_id UUID NOT NULL REFERENCES companies(id),
-    name TEXT NOT NULL,
-    parent_id UUID REFERENCES categories(id)
-);
-
-CREATE TABLE transactions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    account_id UUID NOT NULL REFERENCES accounts(id),
-    amount NUMERIC(14, 2) NOT NULL,
-    description TEXT NOT NULL,
-    occurred_at TIMESTAMPTZ NOT NULL,
-    reconciled BOOLEAN NOT NULL DEFAULT false
-);
-
-CREATE TABLE expenses (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id),
-    category_id UUID NOT NULL REFERENCES categories(id),
-    amount NUMERIC(14, 2) NOT NULL,
-    status TEXT NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED')),
-    receipt_url TEXT,
-    notes TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE invoices (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    company_id UUID NOT NULL REFERENCES companies(id),
-    client_name TEXT NOT NULL,
-    amount NUMERIC(14, 2) NOT NULL,
-    status TEXT NOT NULL DEFAULT 'DRAFT' CHECK (status IN ('DRAFT', 'SENT', 'PAID', 'OVERDUE')),
-    due_date DATE NOT NULL
-);
-
-CREATE TABLE approvals (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    expense_id UUID NOT NULL REFERENCES expenses(id),
-    approver_id UUID NOT NULL REFERENCES users(id),
-    decision TEXT NOT NULL CHECK (decision IN ('APPROVED', 'REJECTED')),
-    comment TEXT,
-    decided_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+-- ==========================================================
+-- Indexes
+-- ==========================================================
+CREATE INDEX IF NOT EXISTS idx_users_company_id ON exp_finlow.users(company_id);
+CREATE INDEX IF NOT EXISTS idx_users_email ON exp_finlow.users(email);
+CREATE INDEX IF NOT EXISTS idx_categories_company_id ON exp_finlow.categories(company_id);
+CREATE INDEX IF NOT EXISTS idx_categories_parent_id ON exp_finlow.categories(parent_id);
+CREATE INDEX IF NOT EXISTS idx_accounts_company_id ON exp_finlow.accounts(company_id);

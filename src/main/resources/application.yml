@@ -2,16 +2,23 @@ spring:
   application:
     name: finflow
 
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration
+
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/finflow
-    username: finflow
-    password: finflow
+    url: r2dbc:postgresql://localhost:5432/finflow?schema=exp_finlow
+    username: postgres
+    password: smartcode
 
   flyway:
-    url: jdbc:postgresql://localhost:5432/finflow
-    user: finflow
-    password: finflow
+    url: jdbc:postgresql://localhost:5432/finflow?currentSchema=exp_finlow
+    user: postgres
+    password: smartcode
     locations: classpath:db/migration
+    schemas: exp_finlow
+    default-schema: exp_finlow
 
 server:
   port: 8080
