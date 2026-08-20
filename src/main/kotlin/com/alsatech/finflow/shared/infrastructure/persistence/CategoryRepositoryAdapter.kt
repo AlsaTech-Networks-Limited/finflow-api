@@ -14,8 +14,18 @@ class CategoryRepositoryAdapter(
     private val template: R2dbcEntityTemplate
 ) : CategoryRepository {
 
+    override fun findById(id: Long): Mono<Category> {
+        val query = Query.query(Criteria.where("id").`is`(id))
+        return template.selectOne(query, Category::class.java)
+    }
+
     override fun findByCompanyId(companyId: Long): Flux<Category> {
         val query = Query.query(Criteria.where("company_id").`is`(companyId))
+        return template.select(query, Category::class.java)
+    }
+
+    override fun findByParentId(parentId: Long): Flux<Category> {
+        val query = Query.query(Criteria.where("parent_id").`is`(parentId))
         return template.select(query, Category::class.java)
     }
 
@@ -25,5 +35,10 @@ class CategoryRepositoryAdapter(
         } else {
             template.update(category)
         }
+    }
+
+    override fun deleteById(id: Long): Mono<Void> {
+        val query = Query.query(Criteria.where("id").`is`(id))
+        return template.delete(query, Category::class.java).then()
     }
 }

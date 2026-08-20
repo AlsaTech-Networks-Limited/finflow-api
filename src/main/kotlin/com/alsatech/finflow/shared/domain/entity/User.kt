@@ -2,7 +2,7 @@ package com.alsatech.finflow.shared.domain.entity
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
-import java.time.Instant
+import java.time.LocalDateTime
 
 enum class Role { USER, MANAGER, ADMIN }
 
@@ -13,5 +13,5 @@ data class User(
     val email: String,
     val passwordHash: String,
     val role: Role,
-    val createdAt: Instant = Instant.now(),
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 )

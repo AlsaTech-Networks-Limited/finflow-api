@@ -1,5 +1,6 @@
-package com.alsatech.finflow.resource.expense.domain
+package com.alsatech.finflow.resource.expense.domain.repository
 
+import com.alsatech.finflow.resource.expense.domain.entity.Approval
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -9,6 +10,6 @@ import reactor.core.publisher.Mono
  * Uses Mono/Flux for reactive streams.
  */
 interface ApprovalRepository {
-    fun findByExpenseId(expenseId: Long): Flux<Approval>
+    fun findByExpenseId(expenseId: String): Flux<Approval>
     fun save(approval: Approval): Mono<Approval>
 }

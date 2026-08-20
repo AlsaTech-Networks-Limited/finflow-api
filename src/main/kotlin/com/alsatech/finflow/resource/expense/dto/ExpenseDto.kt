@@ -1,11 +1,11 @@
-package com.alsatech.finflow.resource.expense.application.dto
+package com.alsatech.finflow.resource.expense.dto
 
-import com.alsatech.finflow.resource.expense.domain.ExpenseStatus
+import com.alsatech.finflow.resource.expense.domain.entity.ExpenseStatus
 import com.collicode.common.util.AuditInfo
 import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.validation.constraints.*
 import java.math.BigDecimal
-import java.time.Instant
+import java.time.LocalDateTime
 
 // ================= COMMAND DTOs (Requests) =================
 
@@ -32,9 +32,8 @@ data class SubmitExpenseCommand(
 )
 
 data class ApproveExpenseCommand(
-    @field:NotNull(message = "Expense ID is required")
-    @field:Positive(message = "Expense ID must be positive")
-    val expenseId: Long,
+    @field:NotBlank(message = "Expense ID is required")
+    val expenseId: String,
 
     @field:NotNull(message = "Approver ID is required")
     @field:Positive(message = "Approver ID must be positive")
@@ -47,9 +46,8 @@ data class ApproveExpenseCommand(
 )
 
 data class RejectExpenseCommand(
-    @field:NotNull(message = "Expense ID is required")
-    @field:Positive(message = "Expense ID must be positive")
-    val expenseId: Long,
+    @field:NotBlank(message = "Expense ID is required")
+    val expenseId: String,
 
     @field:NotNull(message = "Approver ID is required")
     @field:Positive(message = "Approver ID must be positive")
@@ -63,7 +61,7 @@ data class RejectExpenseCommand(
 )
 
 data class GetExpenseQuery(
-    val expenseId: Long
+    val expenseId: String
 )
 
 data class ListExpensesQuery(
@@ -74,8 +72,13 @@ data class ListExpensesQuery(
 
 // ================= RESPONSE DTOs =================
 
+/**
+ * Expense list response DTO.
+ * Used for list endpoints (GET /api/v1/expenses).
+ * ExpenseId format: "exp_1704067200001" (entity-identifiable with prefix).
+ */
 data class ExpenseDto(
-    val id: Long,
+    val expenseId: String,
     val userId: Long,
     val categoryId: Long,
     val amount: BigDecimal,
@@ -84,11 +87,20 @@ data class ExpenseDto(
     val notes: String?,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
-    val createdAt: Instant
+    val createdAt: LocalDateTime,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
+    val updatedAt: LocalDateTime
 )
 
+/**
+ * Expense detail response DTO.
+ * Used for single expense endpoints (GET /api/v1/expenses/{id}).
+ * Includes full approval history.
+ * ExpenseId format: "exp_1704067200001" (entity-identifiable with prefix).
+ */
 data class ExpenseDetailDto(
-    val id: Long,
+    val expenseId: String,
     val userId: Long,
     val categoryId: Long,
     val amount: BigDecimal,
@@ -98,14 +110,31 @@ data class ExpenseDetailDto(
     val approvals: List<ApprovalDto>,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
-    val createdAt: Instant
+    val createdAt: LocalDateTime,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
+    val updatedAt: LocalDateTime
 )
 
+/**
+ * Approval response DTO.
+ * Nested in ExpenseDetailDto to show approval history.
+ * ApprovalId format: "app_1704067300001" (entity-identifiable with prefix).
+ * ExpenseId format: "exp_1704067200001" (entity-identifiable with prefix).
+ */
 data class ApprovalDto(
+    val approvalId: String,
+    val expenseId: String,
     val approverId: Long,
     val decision: String,
     val comment: String?,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
-    val decidedAt: Instant
+    val decidedAt: LocalDateTime,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
+    val createdAt: LocalDateTime,
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
+    val updatedAt: LocalDateTime
 )

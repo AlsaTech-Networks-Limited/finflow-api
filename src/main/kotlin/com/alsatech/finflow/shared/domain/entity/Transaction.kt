@@ -3,7 +3,7 @@ package com.alsatech.finflow.shared.domain.entity
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.math.BigDecimal
-import java.time.Instant
+import java.time.LocalDateTime
 
 enum class TransactionType { DEBIT, CREDIT }
 
@@ -15,5 +15,7 @@ data class Transaction(
     val amount: BigDecimal,
     val description: String? = null,
     val reference: String? = null,
-    val createdAt: Instant = Instant.now(),
+    val occurredAt: LocalDateTime,
+    val reconciled: Boolean = false,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 )
