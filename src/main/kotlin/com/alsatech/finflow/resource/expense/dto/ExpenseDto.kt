@@ -1,6 +1,7 @@
 package com.alsatech.finflow.resource.expense.application.dto
 
 import com.alsatech.finflow.resource.expense.domain.ExpenseStatus
+import com.collicode.common.util.AuditInfo
 import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.validation.constraints.*
 import java.math.BigDecimal
@@ -25,7 +26,9 @@ data class SubmitExpenseCommand(
     @field:Size(max = 500, message = "Notes must not exceed 500 characters")
     val notes: String? = null,
 
-    val receiptUrl: String? = null
+    val receiptUrl: String? = null,
+
+    val auditInfo: AuditInfo? = null
 )
 
 data class ApproveExpenseCommand(
@@ -38,7 +41,9 @@ data class ApproveExpenseCommand(
     val approverId: Long,
 
     @field:Size(max = 500, message = "Comment must not exceed 500 characters")
-    val comment: String? = null
+    val comment: String? = null,
+
+    val auditInfo: AuditInfo? = null
 )
 
 data class RejectExpenseCommand(
@@ -52,7 +57,9 @@ data class RejectExpenseCommand(
 
     @field:NotBlank(message = "Comment is required when rejecting an expense")
     @field:Size(max = 500, message = "Comment must not exceed 500 characters")
-    val comment: String
+    val comment: String,
+
+    val auditInfo: AuditInfo? = null
 )
 
 data class GetExpenseQuery(
